@@ -9,31 +9,15 @@ on:
       - main  # Set your default branch here
 
 jobs:
-  sonarqube_scan:
-    name: Scan with SonarQube
+  build:
+    name: Build and analyze
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
         with:
-          php-version: '7.4'  # Set the PHP version you need for your WordPress project
-          extensions: mbstring, xml  # Add extensions you need
-          coverage: none
-
-      - name: Install Composer Dependencies
-        run: composer install --no-progress
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=YOUR_PROJECT_KEY
-            -Dsonar.organization=YOUR_ORGANIZATION_KEY
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=$SONAR_TOKEN
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
